@@ -1,0 +1,52 @@
+name: Validate Docs
+
+on:
+  push:
+    branches: [ "**" ]
+  pull_request:
+    branches: [ "**" ]
+
+jobs:
+  validate-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check /docs folder exists
+        run: |
+          if [ ! -d "docs" ]; then
+            echo "ERROR: /docs folder is missing."
+            exit 1
+          fi
+          echo "OK: /docs folder found."
+
+      - name: Check ERD file exists (PNG or PDF)
+        run: |
+          if [ -f "docs/ERD.png" ] || [ -f "docs/ERD.pdf" ]; then
+            echo "OK: ERD file found."
+          else
+            echo "ERROR: docs/ERD.png or docs/ERD.pdf is missing."
+            exit 1
+          fi
+
+      - name: Check endpoint plan exists (Markdown or PDF)
+        run: |
+          if [ -f "docs/endpoints.md" ] || [ -f "docs/endpoints.pdf" ]; then
+            echo "OK: endpoint plan found."
+          else
+            echo "ERROR: docs/endpoints.md or docs/endpoints.pdf is missing."
+            exit 1
+          fi
+
+      - name: Check SQL script exists
+        run: |
+          if [ -f "docs/schema.sql" ]; then
+            echo "OK: schema.sql found."
+          else
+            echo "ERROR: docs/schema.sql is missing."
+            exit 1
+          fi
+
+      - name: All required planning documents present
+        run: echo "Validation passed - /docs contains ERD, endpoint plan, and SQL script."
