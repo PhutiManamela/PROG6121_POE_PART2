@@ -1,0 +1,41 @@
+@model ProfileViewModel
+@{ ViewData["Title"] = "My profile"; }
+<div class="row g-4">
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0 text-center"><div class="card-body p-4">
+            @if (!string.IsNullOrEmpty(Model.ProfilePictureUrl))
+            {
+                <img src="@Model.ProfilePictureUrl" class="rd-avatar mb-3" alt="Profile picture" />
+            }
+            else
+            {
+                <div class="rd-avatar-placeholder mx-auto mb-3"><i class="bi bi-person"></i></div>
+            }
+            <h2 class="h5">@Model.FirstName @Model.LastName</h2>
+            <span class="badge bg-primary">@Model.Role</span>
+            <p class="text-muted small mt-2">Member since @Model.CreatedAt.ToString("d MMM yyyy")</p>
+            <form asp-action="UploadPicture" method="post" enctype="multipart/form-data">
+                <input type="file" name="file" class="form-control form-control-sm mb-2" accept="image/jpeg,image/png,image/webp,image/gif" required />
+                <button type="submit" class="btn btn-outline-primary btn-sm w-100">Upload picture</button>
+                <div class="form-text">JPG, PNG, WEBP or GIF, up to 5 MB.</div>
+            </form>
+        </div></div>
+    </div>
+    <div class="col-md-8">
+        <div class="card shadow-sm border-0"><div class="card-body p-4">
+            <h1 class="h4 mb-3">Profile details</h1>
+            <form asp-action="Profile" method="post" novalidate>
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+                <input type="hidden" asp-for="UserId" /><input type="hidden" asp-for="Role" />
+                <input type="hidden" asp-for="CreatedAt" /><input type="hidden" asp-for="ProfilePictureUrl" />
+                <div class="row">
+                    <div class="col-md-6 mb-3"><label asp-for="FirstName" class="form-label"></label><input asp-for="FirstName" class="form-control" /><span asp-validation-for="FirstName" class="text-danger"></span></div>
+                    <div class="col-md-6 mb-3"><label asp-for="LastName" class="form-label"></label><input asp-for="LastName" class="form-control" /><span asp-validation-for="LastName" class="text-danger"></span></div>
+                </div>
+                <div class="mb-3"><label asp-for="Email" class="form-label"></label><input asp-for="Email" class="form-control" /><span asp-validation-for="Email" class="text-danger"></span></div>
+                <button type="submit" class="btn btn-primary">Save changes</button>
+            </form>
+        </div></div>
+    </div>
+</div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

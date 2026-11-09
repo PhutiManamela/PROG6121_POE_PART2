@@ -1,0 +1,67 @@
+@model RaceDetailsViewModel
+@{
+    var e = Model.Event;
+    ViewData["Title"] = e.Name;
+    var role = Context.Session.GetString(SessionKeys.Role);
+    var loggedIn = !string.IsNullOrEmpty(Context.Session.GetString(SessionKeys.Token));
+}
+<a asp-action="Index" class="text-decoration-none">&larr; All races</a>
+<div class="card shadow-sm border-0 mt-2 mb-4">
+    @if (!string.IsNullOrEmpty(e.BannerUrl))
+    {
+        <img src="@e.BannerUrl" class="card-img-top rd-banner" style="height:260px" alt="Banner for @e.Name" />
+    }
+    <div class="card-body">
+        <span class="badge bg-primary">@e.EventType</span>
+        <h1 class="h3 mt-2">@e.Name</h1>
+        <p class="text-muted mb-1"><i class="bi bi-calendar-event me-1"></i>@e.EventDate.ToString("dddd, d MMMM yyyy") &middot; <i class="bi bi-geo-alt me-1"></i>@e.Location &middot; <i class="bi bi-signpost me-1"></i>@e.DistanceKm.ToString("0.##") km</p>
+        <p class="text-muted small">Organised by @e.OrganiserName</p>
+        @if (!string.IsNullOrWhiteSpace(e.Description)) { <p>@e.Description</p> }
+    </div>
+</div>
+<h2 class="h5">Categories</h2>
+@if (e.Categories.Count == 0)
+{
+    <div class="alert alert-info">The organiser hasn't added categories yet.</div>
+}
+else
+{
+    <div class="table-responsive bg-white shadow-sm rounded">
+    <table class="table align-middle mb-0">
+        <thead><tr><th>Category</th><th>Distance</th><th>Limit</th><th>Entry fee</th><th></th></tr></thead>
+        <tbody>
+        @foreach (var c in e.Categories)
+        {
+            <tr>
+                <td>@c.Name</td>
+                <td>@c.DistanceKm.ToString("0.##") km</td>
+                <td>@c.MaxParticipants</td>
+                <td>@(c.EntryFee == 0 ? "Free" : "R " + c.EntryFee.ToString("0.00"))</td>
+                <td class="text-end">
+                    <a class="btn btn-sm btn-outline-secondary" asp-action="Leaderboard" asp-route-categoryId="@c.CategoryId" asp-route-eventId="@e.EventId">Leaderboard</a>
+                    @if (role == "Participant")
+                    {
+                        if (Model.EnrolledCategoryIds.Contains(c.CategoryId))
+                        {
+                            <span class="badge bg-success ms-2">Enrolled</span>
+                        }
+                        else
+                        {
+                            <form asp-action="Enrol" method="post" class="d-inline">
+                                <input type="hidden" name="categoryId" value="@c.CategoryId" />
+                                <input type="hidden" name="eventId" value="@e.EventId" />
+                                <button type="submit" class="btn btn-sm btn-primary ms-1">Enrol</button>
+                            </form>
+                        }
+                    }
+                    else if (!loggedIn)
+                    {
+                        <a class="btn btn-sm btn-primary ms-1" asp-controller="Account" asp-action="Login" asp-route-returnUrl="@Url.Action("Details", "Races", new { id = e.EventId })">Log in to enrol</a>
+                    }
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+    </div>
+}

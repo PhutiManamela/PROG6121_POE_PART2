@@ -1,0 +1,25 @@
+@model List<EventSummary>
+@{ ViewData["Title"] = "Home"; }
+<div class="rd-hero p-5 mb-4">
+    <h1 class="display-5 fw-bold">Find your next race</h1>
+    <p class="lead mb-4">Browse runs, walks and cycling events, enrol in one click and track your results.</p>
+    <a class="btn btn-warning btn-lg me-2" asp-controller="Races" asp-action="Index">Browse races</a>
+    @if (string.IsNullOrEmpty(Context.Session.GetString(SessionKeys.Token)))
+    {
+        <a class="btn btn-outline-light btn-lg" asp-controller="Account" asp-action="Register">Create an account</a>
+    }
+</div>
+<h2 class="h4 mb-3">Upcoming events</h2>
+@if (Model.Count == 0)
+{
+    <div class="alert alert-info">No upcoming events yet. Check back soon!</div>
+}
+else
+{
+    <div class="row g-4">
+        @foreach (var e in Model)
+        {
+            <div class="col-md-4"><partial name="_EventCard" model="e" /></div>
+        }
+    </div>
+}

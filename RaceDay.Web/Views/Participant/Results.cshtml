@@ -1,0 +1,24 @@
+@model List<ResultItem>
+@{ ViewData["Title"] = "My results"; }
+<h1 class="h3 mb-3">My results</h1>
+@if (Model.Count == 0)
+{
+    <div class="alert alert-info">No results yet. Once an organiser captures your finish time it will show up here.</div>
+}
+else
+{
+    <div class="row g-3">
+    @foreach (var r in Model)
+    {
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0 rd-stat"><div class="card-body">
+                <h2 class="h5 mb-0">@r.EventName</h2>
+                <div class="text-muted small mb-2">@r.CategoryName &middot; @r.RecordedAt.ToString("d MMM yyyy")</div>
+                <div class="display-6">@FormatHelper.FinishTime(r.FinishTime)</div>
+                <div class="rd-standing">@FormatHelper.Standing(r.Position, r.TotalFinishers)</div>
+                <a class="small" asp-controller="Races" asp-action="Leaderboard" asp-route-categoryId="@r.CategoryId" asp-route-eventId="@r.EventId">View leaderboard</a>
+            </div></div>
+        </div>
+    }
+    </div>
+}

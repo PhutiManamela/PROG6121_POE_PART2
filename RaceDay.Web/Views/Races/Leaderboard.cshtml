@@ -1,0 +1,24 @@
+@model LeaderboardViewModel
+@{ ViewData["Title"] = "Leaderboard"; }
+<a asp-action="Details" asp-route-id="@Model.EventId" class="text-decoration-none">&larr; Back to race</a>
+<h1 class="h3 mt-2">@Model.EventName <small class="text-muted">&ndash; @Model.CategoryName</small></h1>
+@if (Model.Results.Count == 0)
+{
+    <div class="alert alert-info mt-3">No results have been captured for this category yet.</div>
+}
+else
+{
+    <table class="table table-striped bg-white shadow-sm mt-3">
+        <thead><tr><th>Position</th><th>Participant</th><th>Finish time</th></tr></thead>
+        <tbody>
+        @foreach (var r in Model.Results)
+        {
+            <tr>
+                <td>@(r.Position.HasValue ? FormatHelper.Ordinal(r.Position.Value) : "-")</td>
+                <td>@r.ParticipantName</td>
+                <td class="text-nowrap">@FormatHelper.FinishTime(r.FinishTime)</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}

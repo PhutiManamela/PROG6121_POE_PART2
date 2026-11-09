@@ -1,0 +1,35 @@
+@model ParticipantListViewModel
+@{ ViewData["Title"] = "Participants"; }
+<a asp-action="Events" class="text-decoration-none">&larr; My events</a>
+<h1 class="h3 my-3">@Model.Event.Name <small class="text-muted">participants</small></h1>
+<form method="get" class="row g-2 mb-3">
+    <input type="hidden" name="eventId" value="@Model.Event.EventId" />
+    <div class="col-md-4">
+        <select name="categoryId" class="form-select" onchange="this.form.submit()">
+            <option value="">All categories</option>
+            @foreach (var c in Model.Event.Categories)
+            {
+                <option value="@c.CategoryId" selected="@(Model.CategoryId == c.CategoryId)">@c.Name</option>
+            }
+        </select>
+    </div>
+</form>
+@if (Model.Enrolments.Count == 0)
+{
+    <div class="alert alert-info">No participants enrolled yet.</div>
+}
+else
+{
+    <div class="table-responsive bg-white shadow-sm rounded">
+    <table class="table table-striped mb-0">
+        <thead><tr><th>Participant</th><th>Category</th><th>Enrolled</th><th>Status</th></tr></thead>
+        <tbody>
+        @foreach (var e in Model.Enrolments)
+        {
+            <tr><td>@e.ParticipantName</td><td>@e.CategoryName</td><td>@e.EnrolmentDate.ToString("d MMM yyyy")</td><td><partial name="_StatusBadge" model="e.Status" /></td></tr>
+        }
+        </tbody>
+    </table>
+    </div>
+    <p class="text-muted small mt-2">@Model.Enrolments.Count enrolment(s)</p>
+}
