@@ -1,0 +1,42 @@
+@model ResultsCaptureViewModel
+@{ ViewData["Title"] = "Capture results"; }
+<a asp-action="Events" class="text-decoration-none">&larr; My events</a>
+<h1 class="h3 my-3">@Model.Event.Name <small class="text-muted">results</small></h1>
+<p class="text-muted">Enter the finish time as HH:MM:SS. Position is optional.</p>
+@if (Model.Categories.Count == 0)
+{
+    <div class="alert alert-info">Add categories and wait for enrolments before capturing results.</div>
+}
+@foreach (var cat in Model.Categories)
+{
+    <h2 class="h5 mt-4">@cat.Category.Name</h2>
+    @if (cat.Rows.Count == 0)
+    {
+        <div class="alert alert-secondary">No confirmed participants in this category.</div>
+        continue;
+    }
+    <div class="table-responsive bg-white shadow-sm rounded">
+    <table class="table align-middle mb-0">
+        <thead><tr><th>Participant</th><th>Finish time</th><th>Position</th><th></th></tr></thead>
+        <tbody>
+        @foreach (var row in cat.Rows)
+        {
+            var fid = "f" + row.Enrolment.EnrolmentId;
+            <tr>
+                <td>
+                    <form id="@fid" asp-action="SaveResult" method="post">
+                        <input type="hidden" name="eventId" value="@Model.Event.EventId" />
+                        <input type="hidden" name="enrolmentId" value="@row.Enrolment.EnrolmentId" />
+                        @if (row.Result is not null) { <input type="hidden" name="resultId" value="@row.Result.ResultId" /> }
+                    </form>
+                    @row.Enrolment.ParticipantName
+                </td>
+                <td><input form="@fid" type="text" name="finishTime" class="form-control form-control-sm rd-time-input" placeholder="00:00:00" pattern="\d{1,2}:[0-5]\d:[0-5]\d" title="HH:MM:SS" value="@(row.Result is null ? "" : FormatHelper.FinishTime(row.Result.FinishTime))" required /></td>
+                <td><input form="@fid" type="number" name="position" min="1" class="form-control form-control-sm" style="max-width:90px" value="@row.Result?.Position" /></td>
+                <td class="text-end"><button form="@fid" type="submit" class="btn btn-sm @(row.Result is null ? "btn-primary" : "btn-outline-primary")">@(row.Result is null ? "Capture" : "Update")</button></td>
+            </tr>
+        }
+        </tbody>
+    </table>
+    </div>
+}

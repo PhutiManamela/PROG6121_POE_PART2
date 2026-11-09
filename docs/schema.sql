@@ -5,8 +5,6 @@
    Run on a clean SQL Server instance. Safe to re-run.
    ========================================================= */
 
-USE MASTER;
-GO
 IF DB_ID('RaceDayDB') IS NOT NULL
 BEGIN
     ALTER DATABASE RaceDayDB SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
@@ -38,7 +36,8 @@ CREATE TABLE [User] (
     Email           VARCHAR(100) NOT NULL UNIQUE,
     PasswordHash    VARCHAR(255) NOT NULL,
     RoleId          INT NOT NULL,
-    CreatedAt       DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
+    ProfilePictureUrl VARCHAR(500) NULL,   -- Azure Blob URL (Part 3)
+    CreatedAt       DATETIME NOT NULL DEFAULT GETDATE(),
     CONSTRAINT FK_User_Role FOREIGN KEY (RoleId) REFERENCES Role(RoleId)
 );
 GO
@@ -49,9 +48,12 @@ CREATE TABLE Event (
     Description     VARCHAR(500)  NULL,
     EventDate       DATE          NOT NULL,
     Location        VARCHAR(150)  NOT NULL,
-    ImageUrl        VARCHAR(500)  NULL,
+    DistanceKm      DECIMAL(6,2)  NOT NULL,                 -- Part 3: headline distance
+    EventType       VARCHAR(10)   NOT NULL
+        CHECK (EventType IN ('Run', 'Walk', 'Cycle')),      -- Part 3
+    BannerUrl       VARCHAR(500)  NULL,                     -- Azure Blob URL (Part 3)
     OrganiserId     INT           NOT NULL,
-    CreatedAt       DATETIME2      NOT NULL DEFAULT GETUTCDATE(),
+    CreatedAt       DATETIME      NOT NULL DEFAULT GETDATE(),
     CONSTRAINT FK_Event_Organiser FOREIGN KEY (OrganiserId) REFERENCES [User](UserId)
 );
 GO
@@ -72,7 +74,7 @@ CREATE TABLE Enrolment (
     EnrolmentId     INT IDENTITY(1,1) PRIMARY KEY,
     ParticipantId   INT           NOT NULL,
     CategoryId      INT           NOT NULL,
-    EnrolmentDate   DATETIME2     NOT NULL DEFAULT GETUTCDATE(),
+    EnrolmentDate   DATETIME      NOT NULL DEFAULT GETDATE(),
     Status          VARCHAR(20)   NOT NULL DEFAULT 'Confirmed'
         CHECK (Status IN ('Confirmed', 'Cancelled')),
     CONSTRAINT FK_Enrolment_Participant FOREIGN KEY (ParticipantId) REFERENCES [User](UserId),
@@ -87,7 +89,7 @@ CREATE TABLE Result (
     FinishTime        TIME     NOT NULL,
     Position          INT      NULL,
     RecordedByUserId  INT      NOT NULL,
-    RecordedAt        DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
+    RecordedAt        DATETIME NOT NULL DEFAULT GETDATE(),
     CONSTRAINT FK_Result_Enrolment FOREIGN KEY (EnrolmentId) REFERENCES Enrolment(EnrolmentId) ON DELETE CASCADE,
     CONSTRAINT FK_Result_RecordedBy FOREIGN KEY (RecordedByUserId) REFERENCES [User](UserId)
 );
@@ -102,18 +104,18 @@ GO
 
 -- 2 Organisers, 2+ Participants
 INSERT INTO [User] (FirstName, LastName, Email, PasswordHash, RoleId) VALUES
-('Amanda', 'Reyes',   'amanda.reyes@raceday.com',   'AMANDA123', 1),
-('Sipho',  'Ndlovu',  'sipho.ndlovu@raceday.com',    'SIPHO123', 1),
-('Liam',   'Fischer', 'liam.fischer@example.com',    'LIAM123', 2),
-('Priya',  'Naidoo',  'priya.naidoo@example.com',    'PRIYA123', 2),
-('Chloe',  'Adams',   'chloe.adams@example.com',     'CHLOE123', 2);
+('Amanda', 'Reyes',   'amanda.reyes@raceday.com',   'HASH_PLACEHOLDER_1', 1),
+('Sipho',  'Ndlovu',  'sipho.ndlovu@raceday.com',    'HASH_PLACEHOLDER_2', 1),
+('Liam',   'Fischer', 'liam.fischer@example.com',    'HASH_PLACEHOLDER_3', 2),
+('Priya',  'Naidoo',  'priya.naidoo@example.com',    'HASH_PLACEHOLDER_4', 2),
+('Chloe',  'Adams',   'chloe.adams@example.com',     'HASH_PLACEHOLDER_5', 2);
 GO
 
 -- 3+ Events (owned by the 2 organisers)
-INSERT INTO Event (Name, Description, EventDate, Location,ImageUrl, OrganiserId) VALUES
-('City Marathon 2026',        'Annual road running event through the city center.', '2026-11-14', 'Cape Town CBD', 'http://example.com/city_marathon_2026.jpg',      1),
-('Riverside Fun Run',         'Family-friendly run along the river trail.',          '2026-10-03', 'Riverside Park','http://example.com/riverside_fun_run.jpg',     1),
-('Mountain Trail Challenge',  'Off-road trail race with elevation.',                 '2026-12-05', 'Table Mountain Reserve', 'http://example.com/mountain_trail_challenge.jpg', 2);
+INSERT INTO Event (Name, Description, EventDate, Location, DistanceKm, EventType, OrganiserId) VALUES
+('City Marathon 2026',        'Annual road running event through the city center.', '2026-11-14', 'Cape Town CBD', 42.20, 'Run', 1),
+('Riverside Fun Run',         'Family-friendly run along the river trail.',          '2026-10-03', 'Riverside Park', 5.00, 'Run', 1),
+('Mountain Trail Challenge',  'Off-road trail race with elevation.',                 '2026-12-05', 'Table Mountain Reserve', 15.00, 'Run', 2);
 GO
 
 -- Multiple categories per event
@@ -136,7 +138,7 @@ INSERT INTO Enrolment (ParticipantId, CategoryId, Status) VALUES
 (4, 1, 'Confirmed');  -- Priya in Event1 10km
 GO
 
-
+-- Sample results (recorded by the owning organiser)
 INSERT INTO Result (EnrolmentId, FinishTime, Position, RecordedByUserId) VALUES
 (1, '00:52:14', 3, 1),
 (2, '01:58:40', 1, 1),

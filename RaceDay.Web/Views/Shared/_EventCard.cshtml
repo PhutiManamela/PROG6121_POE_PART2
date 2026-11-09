@@ -1,0 +1,21 @@
+@model EventSummary
+<div class="card h-100 shadow-sm rd-card">
+    @if (!string.IsNullOrEmpty(Model.BannerUrl))
+    {
+        <img src="@Model.BannerUrl" class="card-img-top rd-banner" alt="Banner for @Model.Name" />
+    }
+    else
+    {
+        <div class="rd-banner rd-banner-placeholder d-flex align-items-center justify-content-center"><i class="bi bi-trophy fs-1"></i></div>
+    }
+    <div class="card-body">
+        <span class="badge bg-primary mb-2">@Model.EventType</span>
+        <h5 class="card-title">@Model.Name</h5>
+        <p class="card-text text-muted mb-0"><i class="bi bi-calendar-event me-1"></i>@Model.EventDate.ToString("ddd, d MMM yyyy")</p>
+        <p class="card-text text-muted mb-0"><i class="bi bi-geo-alt me-1"></i>@Model.Location</p>
+        <p class="card-text text-muted"><i class="bi bi-signpost me-1"></i>@Model.DistanceKm.ToString("0.##") km</p>
+    </div>
+    <div class="card-footer bg-transparent border-0 pb-3">
+        <a class="btn btn-primary w-100" asp-controller="Races" asp-action="Details" asp-route-id="@Model.EventId">View race</a>
+    </div>
+</div>

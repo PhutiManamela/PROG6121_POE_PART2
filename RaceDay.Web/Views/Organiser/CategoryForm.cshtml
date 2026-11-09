@@ -1,0 +1,21 @@
+@model CategoryFormViewModel
+@{
+    var editing = Model.CategoryId.HasValue;
+    ViewData["Title"] = editing ? "Edit category" : "Add category";
+}
+<div class="row justify-content-center"><div class="col-md-6">
+<div class="card shadow-sm border-0"><div class="card-body p-4">
+    <h1 class="h4">@ViewData["Title"]</h1>
+    <p class="text-muted">@Model.EventName</p>
+    <form method="post" asp-action="@(editing ? "EditCategory" : "CreateCategory")" asp-route-id="@Model.CategoryId" novalidate>
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+        <input type="hidden" asp-for="EventId" /><input type="hidden" asp-for="EventName" />
+        <div class="mb-3"><label asp-for="Name" class="form-label"></label><input asp-for="Name" class="form-control" /><span asp-validation-for="Name" class="text-danger"></span></div>
+        <div class="mb-3"><label asp-for="DistanceKm" class="form-label"></label><input asp-for="DistanceKm" type="number" step="0.1" class="form-control" /><span asp-validation-for="DistanceKm" class="text-danger"></span></div>
+        <div class="mb-3"><label asp-for="MaxParticipants" class="form-label"></label><input asp-for="MaxParticipants" type="number" class="form-control" /><span asp-validation-for="MaxParticipants" class="text-danger"></span></div>
+        <div class="mb-3"><label asp-for="EntryFee" class="form-label"></label><input asp-for="EntryFee" type="number" step="0.01" class="form-control" /><span asp-validation-for="EntryFee" class="text-danger"></span></div>
+        <button type="submit" class="btn btn-primary">Save</button>
+        <a asp-action="Categories" asp-route-eventId="@Model.EventId" class="btn btn-link">Cancel</a>
+    </form>
+</div></div></div></div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

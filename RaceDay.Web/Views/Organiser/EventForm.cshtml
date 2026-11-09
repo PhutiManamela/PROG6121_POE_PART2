@@ -1,0 +1,34 @@
+@model EventFormViewModel
+@{
+    var editing = Model.EventId.HasValue;
+    ViewData["Title"] = editing ? "Edit event" : "New event";
+}
+<div class="row justify-content-center"><div class="col-lg-8">
+<div class="card shadow-sm border-0"><div class="card-body p-4">
+    <h1 class="h4 mb-3">@ViewData["Title"]</h1>
+    <form method="post" enctype="multipart/form-data" asp-action="@(editing ? "EditEvent" : "CreateEvent")" asp-route-id="@Model.EventId" novalidate>
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+        <input type="hidden" asp-for="BannerUrl" />
+        <div class="mb-3"><label asp-for="Name" class="form-label"></label><input asp-for="Name" class="form-control" /><span asp-validation-for="Name" class="text-danger"></span></div>
+        <div class="mb-3"><label asp-for="Description" class="form-label"></label><textarea asp-for="Description" class="form-control" rows="3"></textarea><span asp-validation-for="Description" class="text-danger"></span></div>
+        <div class="row">
+            <div class="col-md-6 mb-3"><label asp-for="EventDate" class="form-label"></label><input asp-for="EventDate" type="date" class="form-control" value="@Model.EventDate?.ToString("yyyy-MM-dd")" /><span asp-validation-for="EventDate" class="text-danger"></span></div>
+            <div class="col-md-6 mb-3"><label asp-for="Location" class="form-label"></label><input asp-for="Location" class="form-control" /><span asp-validation-for="Location" class="text-danger"></span></div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 mb-3"><label asp-for="DistanceKm" class="form-label"></label><input asp-for="DistanceKm" type="number" step="0.1" class="form-control" /><span asp-validation-for="DistanceKm" class="text-danger"></span></div>
+            <div class="col-md-6 mb-3"><label asp-for="EventType" class="form-label"></label>
+                <select asp-for="EventType" class="form-select"><option>Run</option><option>Walk</option><option>Cycle</option></select>
+                <span asp-validation-for="EventType" class="text-danger"></span></div>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Banner" class="form-label"></label>
+            @if (!string.IsNullOrEmpty(Model.BannerUrl)) { <div class="mb-2"><img src="@Model.BannerUrl" class="rounded" style="max-height:120px" alt="Current banner" /></div> }
+            <input asp-for="Banner" type="file" class="form-control" accept="image/jpeg,image/png,image/webp,image/gif" />
+            <div class="form-text">Optional. JPG, PNG, WEBP or GIF, up to 5 MB. Uploaded through the API to Azure Blob Storage.</div>
+        </div>
+        <button type="submit" class="btn btn-primary">@(editing ? "Save changes" : "Create event")</button>
+        <a asp-action="Events" class="btn btn-link">Cancel</a>
+    </form>
+</div></div></div></div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

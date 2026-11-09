@@ -1,0 +1,30 @@
+@model RaceCatalogViewModel
+@{ ViewData["Title"] = "Browse races"; }
+<h1 class="h3 mb-3">Browse races</h1>
+<form method="get" class="row g-2 mb-4">
+    <div class="col-md-5"><input type="text" name="search" value="@Model.Search" class="form-control" placeholder="Search by name or location" /></div>
+    <div class="col-md-3"><input type="date" name="date" value="@Model.Date?.ToString("yyyy-MM-dd")" class="form-control" /></div>
+    <div class="col-md-2">
+        <select name="eventType" class="form-select">
+            <option value="">All types</option>
+            @foreach (var t in new[] { "Run", "Walk", "Cycle" })
+            {
+                <option value="@t" selected="@(Model.EventType == t)">@t</option>
+            }
+        </select>
+    </div>
+    <div class="col-md-2 d-grid"><button class="btn btn-primary" type="submit">Filter</button></div>
+</form>
+@if (Model.Events.Count == 0)
+{
+    <div class="alert alert-info">No races match your filters.</div>
+}
+else
+{
+    <div class="row g-4">
+        @foreach (var e in Model.Events)
+        {
+            <div class="col-md-6 col-lg-4"><partial name="_EventCard" model="e" /></div>
+        }
+    </div>
+}

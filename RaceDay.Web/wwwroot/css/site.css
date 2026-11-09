@@ -1,0 +1,13 @@
+:root { --rd-primary: #0b5ed7; --rd-dark: #0a2540; }
+body { background: #f6f8fb; }
+.rd-navbar { background: var(--rd-dark); }
+.rd-card { border: 0; transition: transform .15s ease, box-shadow .15s ease; }
+.rd-card:hover { transform: translateY(-3px); box-shadow: 0 .5rem 1rem rgba(0,0,0,.12) !important; }
+.rd-banner { height: 160px; width: 100%; object-fit: cover; }
+.rd-banner-placeholder { background: linear-gradient(135deg, #0a2540, #0b5ed7); color: #fff; }
+.rd-hero { background: linear-gradient(135deg, #0a2540, #0b5ed7); color: #fff; border-radius: .75rem; }
+.rd-stat { border-left: 4px solid var(--rd-primary); }
+.rd-avatar { width: 120px; height: 120px; object-fit: cover; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 0 0 1px #dee2e6; }
+.rd-avatar-placeholder { width: 120px; height: 120px; border-radius: 50%; background: #dee2e6; color: #6c757d; display: flex; align-items: center; justify-content: center; font-size: 3rem; }
+.rd-standing { font-size: 1.15rem; font-weight: 600; }
+.rd-time-input { max-width: 120px; font-variant-numeric: tabular-nums; }
